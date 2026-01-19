@@ -13,8 +13,8 @@ public class Carrera implements Runnable {
     private final int MAX_PUNTOS = 100;
     private final int MAX_RANGO = 11;
 
-    private final String MSG_GANADOR = "Has ganadoooo";
-    private final String MSG_PERDEDOR = "Game over";
+    public static final String MSG_GANADOR = "Has ganadoooo";
+    public static final String MSG_PERDEDOR = "Game over";
 
     private final String MSG_ERROR = "A ocurrido un error";
 
