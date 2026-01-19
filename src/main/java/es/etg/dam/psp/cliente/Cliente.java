@@ -18,6 +18,7 @@ public class Cliente {
             Conexion.enviar(sc.nextLine(), servidor);
 
             System.out.println(Conexion.recibir(servidor));
+            System.out.println(Conexion.recibir(servidor));
 
             while (true) {
                 String msg = Conexion.recibir(servidor);

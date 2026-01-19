@@ -14,6 +14,7 @@ public class Servidor {
 
     public static final String MSG_ESPERA = "Servidor en espera";
     public static final String MSG_OK = "OK";
+    public static final String MSG_CARRILES = "Tu carril es el numero : %d";
 
     public static final int NUM_JUGADORES = 4;
 
@@ -27,7 +28,9 @@ public class Servidor {
                     Socket cliente = server.accept();
                     String nombre = Conexion.recibir(cliente);
                     Conexion.enviar(MSG_OK, cliente);
+                    Conexion.enviar(String.format(MSG_CARRILES, i), cliente);
                     jugadores[i] = new Jugador(nombre, cliente);
+                    System.out.println("La carrera a empezado");
                 }
                 Thread carrera = new Thread(new Carrera(jugadores));
                 carrera.start();

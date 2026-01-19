@@ -16,7 +16,7 @@ public class Carrera implements Runnable {
     public static final String MSG_GANADOR = "Has ganadoooo";
     public static final String MSG_PERDEDOR = "Game over";
 
-    private final String MSG_ERROR = "A ocurrido un error";
+    private final String MSG_ERROR = "Ha ocurrido un error";
 
     private final Random random = new Random();
 
@@ -24,6 +24,10 @@ public class Carrera implements Runnable {
 
     @Override
     public void run() {
+        try {
+            pintarCarriles();
+        } catch (IOException e) {
+        }
         while (true) {
             Jugador jugador = avanzar();
             try {
@@ -71,6 +75,16 @@ public class Carrera implements Runnable {
             } else {
                 Conexion.enviar(MSG_PERDEDOR, j.getConexion());
             }
+        }
+    }
+
+    private void pintarCarriles() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int i = 1;
+        for (Jugador j : jugadores) {
+            sb.append(i).append(" ");
+            Conexion.enviar(sb.toString(), j.getConexion());
+            i++;
         }
     }
 }
