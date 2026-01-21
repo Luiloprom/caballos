@@ -24,10 +24,6 @@ public class Carrera implements Runnable {
 
     @Override
     public void run() {
-        try {
-            pintarCarriles();
-        } catch (IOException e) {
-        }
         while (true) {
             Jugador jugador = avanzar();
             try {
@@ -40,7 +36,6 @@ public class Carrera implements Runnable {
                 System.out.println(MSG_ERROR);
             }
         }
-
     }
 
     private Jugador avanzar() {
@@ -58,8 +53,9 @@ public class Carrera implements Runnable {
 
     private String obtenerPuntos() throws IOException {
         StringBuilder sb = new StringBuilder();
+        sb.append("Marcador = ");
         for (Jugador jugador : jugadores) {
-            sb.append(jugador.getPuntos()).append(" ");
+            sb.append(String.format("%s : %d, ", jugador.getNombre(), jugador.getPuntos()));
         }
         return sb.toString();
     }
@@ -75,16 +71,6 @@ public class Carrera implements Runnable {
             } else {
                 Conexion.enviar(MSG_PERDEDOR, j.getConexion());
             }
-        }
-    }
-
-    private void pintarCarriles() throws IOException {
-        StringBuilder sb = new StringBuilder();
-        int i = 1;
-        for (Jugador j : jugadores) {
-            sb.append(i).append(" ");
-            Conexion.enviar(sb.toString(), j.getConexion());
-            i++;
         }
     }
 }
