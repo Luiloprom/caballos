@@ -2,30 +2,25 @@ package es.etg.dam.psp.cliente;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
 
 import es.etg.dam.psp.conexion.Conexion;
 import es.etg.dam.psp.servidor.Servidor;
-import es.etg.dam.psp.servidor.partida.Carrera;
+import static es.etg.dam.psp.servidor.partida.Carrera.MSG_GANADOR;
+import static es.etg.dam.psp.servidor.partida.Carrera.MSG_PERDEDOR;
 
 public class Cliente {
 
+    public static final int PARAM_NOMBRE = 0;
+
     public static void main(String[] args) {
         try (Socket servidor = new Socket(Servidor.HOST, Servidor.PUERTO)) {
-            Scanner sc = new Scanner(System.in);
 
-            System.out.println("Ingrese su nombre por favor");
-            Conexion.enviar(sc.nextLine(), servidor);
-
-            System.out.println(Conexion.recibir(servidor));
-            System.out.println(Conexion.recibir(servidor));
+            Conexion.enviar(args[PARAM_NOMBRE], servidor);
 
             while (true) {
                 String msg = Conexion.recibir(servidor);
-                if (msg.equals(Carrera.MSG_GANADOR) || msg.equals(Carrera.MSG_PERDEDOR)) {
+                if (MSG_GANADOR.equals(msg) || MSG_PERDEDOR.equals(msg)) {
                     System.out.println(msg);
-                    sc.close();
-                    servidor.close();
                     break;
                 } else {
                     System.out.println(msg);
