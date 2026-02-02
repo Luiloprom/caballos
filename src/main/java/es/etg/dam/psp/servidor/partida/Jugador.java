@@ -6,6 +6,8 @@ import lombok.Data;
 
 @Data
 public class Jugador {
+    public static final int MAX_PUNTOS = 100;
+
     private String nombre;
     private int puntos = 0;
     private Socket conexion;
@@ -17,5 +19,9 @@ public class Jugador {
 
     public void sumar(int puntos) {
         this.puntos += puntos;
+    }
+
+    public boolean esGanador() {
+        return (puntos >= MAX_PUNTOS);
     }
 }

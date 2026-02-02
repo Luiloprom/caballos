@@ -10,6 +10,7 @@ import static es.etg.dam.psp.servidor.partida.Carrera.MSG_PERDEDOR;
 
 public class Cliente {
 
+    public static final String MSG_ERROR_SERVER = "A ocurrido un error al establecer la conexion";
     public static final int PARAM_NOMBRE = 0;
 
     public static void main(String[] args) {
@@ -17,17 +18,16 @@ public class Cliente {
 
             Conexion.enviar(args[PARAM_NOMBRE], servidor);
 
-            while (true) {
+            boolean comprobacion = false;
+            while (!comprobacion) {
                 String msg = Conexion.recibir(servidor);
                 if (MSG_GANADOR.equals(msg) || MSG_PERDEDOR.equals(msg)) {
-                    System.out.println(msg);
-                    break;
-                } else {
-                    System.out.println(msg);
+                    comprobacion = true;
                 }
+                System.out.println(msg);
             }
         } catch (IOException e) {
-
+            System.out.println(MSG_ERROR_SERVER);
         }
     }
 }

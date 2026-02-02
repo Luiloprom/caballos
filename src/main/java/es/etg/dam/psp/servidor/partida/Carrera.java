@@ -2,34 +2,40 @@ package es.etg.dam.psp.servidor.partida;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import es.etg.dam.psp.conexion.Conexion;
-import es.etg.dam.psp.servidor.Servidor;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class Carrera implements Runnable {
-    private final int MAX_PUNTOS = 100;
     private final int MAX_RANGO = 11;
+
+    public static final int NUM_JUGADORES = 4;
 
     public static final String MSG_GANADOR = "Has ganadoooo";
     public static final String MSG_PERDEDOR = "Game over";
 
+    public static final String MSG_MARCADOR = "Marcador = ";
+    public static final String FORMATO_NOMBRE = "* %s";
+
+    public static final String FORMATO_DEFAULT = "%s : %d | ";
+
     private final String MSG_ERROR = "Ha ocurrido un error";
 
-    private final Random random = new Random();
-
-    private final Jugador[] jugadores;
+    private final List<Jugador> jugadores = new ArrayList<>(NUM_JUGADORES);
 
     @Override
     public void run() {
-        while (true) {
+        boolean fin = false;
+        while (!fin) {
             Jugador jugador = avanzar();
             try {
-                if (esGanador(jugador)) {
+                if (jugador.esGanador()) {
                     finPartida(jugador);
-                    break;
+                    fin = true;
                 }
                 notificar(jugador);
             } catch (Exception e) {
@@ -39,38 +45,43 @@ public class Carrera implements Runnable {
     }
 
     private Jugador avanzar() {
-        int jug = random.nextInt(Servidor.NUM_JUGADORES);
-        int puntos = random.nextInt(MAX_RANGO);
-        jugadores[jug].sumar(puntos);
-        return jugadores[jug];
+        int jug = generarAleatorio(NUM_JUGADORES);
+        int puntos = generarAleatorio(MAX_RANGO);
+        Jugador jugador = jugadores.get(jug);
+        jugador.sumar(puntos);
+        return jugador;
     }
 
     private void notificar(Jugador jugador) throws IOException {
         Socket jug = jugador.getConexion();
-        String msg = obtenerPuntos();
+        String msg = obtenerPuntos(jugador);
         Conexion.enviar(msg, jug);
     }
 
-    private String obtenerPuntos() throws IOException {
+    private String obtenerPuntos(Jugador jugadorAvanza) throws IOException {
         StringBuilder sb = new StringBuilder();
-        sb.append("Marcador = ");
+        sb.append(MSG_MARCADOR);
         for (Jugador jugador : jugadores) {
-            sb.append(String.format("%s : %d, ", jugador.getNombre(), jugador.getPuntos()));
+            String nombre = (jugador == jugadorAvanza) ? String.format(FORMATO_NOMBRE, jugador.getNombre())
+                    : jugador.getNombre();
+            sb.append(String.format(FORMATO_DEFAULT, nombre, jugador.getPuntos()));
         }
         return sb.toString();
     }
 
-    private boolean esGanador(Jugador jugador) {
-        return jugador.getPuntos() >= MAX_PUNTOS;
-    }
-
     private void finPartida(Jugador jugador) throws Exception {
         for (Jugador j : jugadores) {
-            if (j == jugador) {
-                Conexion.enviar(MSG_GANADOR, jugador.getConexion());
-            } else {
-                Conexion.enviar(MSG_PERDEDOR, j.getConexion());
-            }
+            String mensaje = (j == jugador) ? MSG_GANADOR : MSG_PERDEDOR;
+            Conexion.enviar(mensaje, j.getConexion());
         }
+    }
+
+    public void addJugador(String nombre, Socket socket) {
+        jugadores.add(new Jugador(nombre, socket));
+    }
+
+    private int generarAleatorio(int max) {
+        Random random = new Random();
+        return random.nextInt(max);
     }
 }
